@@ -751,16 +751,18 @@ fn create_archive(backup_path: PathBuf, backup: File, arguments: Commands) {
         let snapshot = arc.create_snapshot().unwrap();
         let mut stream = snapshot.create_stream().unwrap();
 
-        let walker = WalkDir::new("src").sort_by_file_name().into_iter();
-        for entry in walker {
-            let entry = entry.unwrap();
-            if entry.file_type().is_file() {
-                stream
-                    .add_item(
-                        entry.path().to_string_lossy().into_owned(),
-                        File::open(entry.path()).unwrap(),
-                    )
-                    .unwrap();
+        for input in input {
+            let walker = WalkDir::new(input).sort_by_file_name().into_iter();
+            for entry in walker {
+                let entry = entry.unwrap();
+                if entry.file_type().is_file() {
+                    stream
+                        .add_item(
+                            entry.path().to_string_lossy().into_owned(),
+                            File::open(entry.path()).unwrap(),
+                        )
+                        .unwrap();
+                }
             }
         }
         stream.finish().unwrap();
